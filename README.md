@@ -62,3 +62,18 @@ The current automated test suite contains two tests: user login and security fin
 - Do not commit the local SQLite database, virtual environment, Python cache files, or real secret keys.
 - Configure `DJANGO_SECRET_KEY`, `DJANGO_DEBUG`, and `DJANGO_ALLOWED_HOSTS` as environment variables when deploying.
 - This repository contains the current development implementation. CI/CD pipeline configuration and deployment evidence are separate follow-up tasks.
+
+
+## Continuous integration (CircleCI)
+
+This repository includes a CircleCI pipeline at `.circleci/config.yml`. When the repository is connected to CircleCI and a build is triggered, the job installs the requirements, runs `python manage.py check`, applies migrations, and runs the dashboard unit tests.
+
+### Enable the pipeline
+
+1. Sign in to CircleCI using the GitHub account that can access this repository.
+2. Add or set up the `secure-code-factory-dashboard` project.
+3. Select the `feature/add-django-implementation` branch for the first build, or enable builds for all branches.
+4. CircleCI should detect `.circleci/config.yml` and start the workflow. If prompted, choose the option to use the existing configuration.
+5. Open the Pipelines page and save a screenshot showing the workflow and test job result for the project report.
+
+A successful CI run is not claimed until CircleCI has executed the workflow and displayed a green result.
