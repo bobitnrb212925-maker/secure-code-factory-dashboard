@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Secure Code Factory | Monitoring Dashboard</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font:15px Arial,sans-serif;background:#f3f5f9;color:#252b3b}
+    header{background:#182235;color:white;padding:22px 30px}header h1{margin:0;font-size:22px}
+    main{max-width:1200px;margin:auto;padding:28px}.intro{margin-bottom:22px;color:#596579}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+    .card,.panel{background:white;border:1px solid #e5e9f0;border-radius:10px;padding:20px}
+    .card small{color:#6c7789}.number{display:block;font-size:30px;font-weight:bold;margin-top:10px}
+    .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:20px 0}
+    .charts img{width:100%;height:auto}.panel h2{font-size:18px;margin-top:0}
+    form{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+    select,button{padding:10px;border:1px solid #ccd3df;border-radius:6px;background:white}
+    button{background:#263a59;color:white;cursor:pointer;border:0}
+    .table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px}
+    th,td{text-align:left;padding:12px;border-bottom:1px solid #edf0f4}th{background:#f8f9fb;color:#657187}
+    .muted{color:#7b8493;text-align:center;padding:20px}
+    @media(max-width:800px){.cards{grid-template-columns:1fr 1fr}.charts{grid-template-columns:1fr}}
+    @media(max-width:480px){main{padding:15px}.cards{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header><h1>Secure Code Factory — SITF Monitoring Dashboard</h1></header>
+<main>
+  <p class="intro">Monitor security findings across Endpoint/IDE, VCS, CI/CD, Registry and Production.</p>
+  <section class="cards">
+    <div class="card"><small>Total Findings</small><span class="number">{{ total }}</span></div>
+    <div class="card"><small>Open Findings</small><span class="number">{{ open_findings }}</span></div>
+    <div class="card"><small>Resolved Findings</small><span class="number">{{ resolved }}</span></div>
+    <div class="card"><small>Critical Findings</small><span class="number">{{ critical }}</span></div>
+  </section>
+  <section class="charts">
+    <div class="panel"><h2>Findings by Severity</h2><img src="data:image/png;base64,{{ severity_chart }}" alt="Findings by severity"></div>
+    <div class="panel"><h2>Findings by SITF Pillar</h2><img src="data:image/png;base64,{{ pillar_chart }}" alt="Findings by pillar"></div>
+  </section>
+  <section class="panel">
+    <h2>Security Findings</h2>
+    <form method="get">
+      <select name="severity">
+        <option value="">All severities</option>
+        {% for value,label in findings.model.SEVERITY_CHOICES %}
+          <option value="{{ value }}" {% if selected_severity == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+        <option value="Critical" {% if selected_severity == "Critical" %}selected{% endif %}>Critical</option>
+        <option value="High" {% if selected_severity == "High" %}selected{% endif %}>High</option>
+        <option value="Medium" {% if selected_severity == "Medium" %}selected{% endif %}>Medium</option>
+        <option value="Low" {% if selected_severity == "Low" %}selected{% endif %}>Low</option>
+      </select>
+      <select name="pillar">
+        <option value="">All pillars</option>
+        {% for pillar in pillars %}
+          <option value="{{ pillar.id }}" {% if selected_pillar == pillar.id|stringformat:"s" %}selected{% endif %}>{{ pillar.name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Apply filters</button>
+      <a href="/" style="padding:10px">Clear</a>
+    </form>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Finding</th><th>SITF Pillar</th><th>Severity</th><th>Status</th><th>Date</th></tr></thead>
+      <tbody>
+      {% for finding in findings %}
+        <tr><td>{{ finding.title }}</td><td>{{ finding.pillar.name }}</td><td>{{ finding.severity }}</td><td>{{ finding.status }}</td><td>{{ finding.created_at|date:"d M Y" }}</td></tr>
+      {% empty %}
+        <tr><td colspan="5" class="muted">No security findings match your filters.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table></div>
+  </section>
+  <p class="muted"><a href="/admin/">Open administration</a></p>
+</main>
+</body>
+</html>
