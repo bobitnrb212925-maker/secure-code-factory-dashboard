@@ -1,0 +1,29 @@
+version: 2.1
+
+jobs:
+  test:
+    docker:
+      - image: cimg/python:3.12
+    working_directory: ~/project
+    steps:
+      - checkout
+      - run:
+          name: Upgrade pip
+          command: python -m pip install --upgrade pip
+      - run:
+          name: Install project dependencies
+          command: pip install -r requirements.txt
+      - run:
+          name: Check Django configuration
+          command: python manage.py check
+      - run:
+          name: Apply database migrations
+          command: python manage.py migrate --noinput
+      - run:
+          name: Run dashboard unit tests
+          command: python manage.py test dashboard --verbosity=2
+
+workflows:
+  secure-code-factory-ci:
+    jobs:
+      - test
